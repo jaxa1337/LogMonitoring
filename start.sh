@@ -1,0 +1,118 @@
+#!/bin/bash
+
+## In case of any error without piplelining - exit immediately
+# set -e
+
+## Exit if tere is unbound (unused) variables
+# set -u
+
+## Redirect all error output to errors.log
+exec 2>errors.log
+
+## Varibles
+cmd_rm="rm -f"
+lock_file="/tmp/log_sys_lock_file"
+loki_config="loki/loki-config.yaml"
+loki_archive="loki/loki-linux-arm64.zip"
+promtail_config="promtail/promtail-config.yaml"
+promtail_archive="promtail/promtail-linux-amd64.zip"
+version=2.5.0
+# nextcloud_port=8081
+# loki_port=3100
+# grafana_port=3000
+
+## Links
+link_loki_config="https://raw.githubusercontent.com/grafana/loki/v$version/cmd/loki/loki-local-config.yaml"
+link_loki_archive="https://github.com/grafana/loki/releases/download/v$version/loki-linux-arm64.zip"
+link_promtail_config="https://raw.githubusercontent.com/grafana/loki/v$version/clients/cmd/promtail/promtail-docker-config.yaml"
+link_promtail_archive="https://github.com/grafana/loki/releases/download/v$version/promtail-linux-amd64.zip"
+
+## Check directory and if doesn't exist, create this.
+function test_create_directory() {
+    if [ -d "$1" ]; then
+        echo "$1 directory exist!"
+    else
+        mkdir "$1"
+        echo "$1 directory created."
+    fi
+}
+
+## Check if lock_file exist and delete it if is.
+function remove_lock_file() {
+    if [ -e "$lock_file" ]; then
+        $cmd_rm "$lock_file" || {
+            echo "Cannot remove lock file: ${lock_file}"
+            exit 3
+        }
+    fi
+}
+
+## Check if file exist, if not download them.
+function check_download_file() {
+    if [ -n "$1" ] && [ -n "$2" ]; then
+        if [ ! -e "$1" ]; then
+            echo "Try download file $1 from $2"
+            wget "$2" -O "$1"
+        else
+            echo "File $1 exist!"
+            return 2
+        fi
+    else
+        echo "This function needs two arguments!"
+        exit 2
+    fi
+
+    if [ -s "$1" ]; then
+        echo "File downloaded. OK."
+        return 1
+    else
+        echo "Download failed!"
+        $cmd_rm "$1"
+    fi
+}
+
+## Catch Ctr+C signal
+# trap remove_lock_file SIGINT
+
+## Create directories for loki promtail grafana and logs
+directories=(grafana logs loki promtail)
+for directory in "${directories[@]}"; do
+    test_create_directory "$directory"
+done
+
+##Download nessesary files
+check_download_file $loki_config $link_loki_config
+check_download_file $loki_archive $link_loki_archive
+check_download_file $promtail_config $link_promtail_config
+check_download_file $promtail_archive $link_promtail_archive
+
+CURRENT_FOLDER=$(pwd)
+LOGS_FOLDER=$CURRENT_FOLDER/logs
+echo "Logs from nextcloud will be stored in $LOGS_FOLDER."
+
+#------------------------RUN DOCKER CONTAINERS---------------------------------
+
+# #-----------NEXTCLOUD---------
+# # #-v path_on_host:path_in_docker_container \
+# docker run --name nextcloud -d \
+#         -p $nextcloud_port:80 \
+#         -v "$LOGS_FOLDER":/var/log/apache2 \
+#         nextcloud
+
+# #--------------LOKI-----------
+# docker run --name loki -d \
+#         -v $(pwd)/loki:/mnt/config \
+#         -p $loki_port:3100 grafana/loki:$version \
+#         -config.file=/mnt/config/loki-config.yaml
+
+# #------------PROMTAIL---------
+# docker run --name promtail -d \
+#         -v $(pwd)/promtail:/mnt/config \
+#         -v /var/log:/var/log \
+#         -v "$LOGS_FOLDER":/var/nextcloud \
+#         --link loki grafana/promtail:$version \
+#         -config.file=/mnt/config/promtail-config.yaml
+
+# #------------GRAFANA-----------
+# docker run --name grafana -d \
+#         -p $grafana_port:3000 grafana/grafana
