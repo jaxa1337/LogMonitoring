@@ -20,6 +20,8 @@ version=2.5.0
 # nextcloud_port=8081
 # loki_port=3100
 # grafana_port=3000
+current_directory=$(pwd)
+logs_directory=$current_directory/logs
 
 ## Links
 link_loki_config="https://raw.githubusercontent.com/grafana/loki/v$version/cmd/loki/loki-local-config.yaml"
@@ -86,9 +88,23 @@ check_download_file $loki_archive $link_loki_archive
 check_download_file $promtail_config $link_promtail_config
 check_download_file $promtail_archive $link_promtail_archive
 
-CURRENT_FOLDER=$(pwd)
-LOGS_FOLDER=$CURRENT_FOLDER/logs
-echo "Logs from nextcloud will be stored in $LOGS_FOLDER."
+echo "Logs from nextcloud will be stored in $logs_directory."
+
+#Edit config files
+text="
+- job_name: nextcloud
+    static_configs:
+    - targets:
+        - localhost
+        labels:
+        job: nextcloud_apache
+        instance: localserver
+        __path__: $logs_directory"
+
+if [ -z "$(grep "nextcloud" ./$promtail_config)" ]; then
+    echo "$text" >> $promtail_config
+fi
+
 
 #------------------------RUN DOCKER CONTAINERS---------------------------------
 

@@ -7,4 +7,3 @@ docker-compose.yaml
 dopracować skrypt uruchomieniowy
 dashboard
 zapytania przykładowe i co w ogóle zbierać
-repozytorium na github
