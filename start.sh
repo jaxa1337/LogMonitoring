@@ -106,6 +106,7 @@ if [ -z "$(grep "nextcloud" ./$promtail_config)" ]; then
 fi
 
 
+
 #------------------------RUN DOCKER CONTAINERS---------------------------------
 
 # #-----------NEXTCLOUD---------

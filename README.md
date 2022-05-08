@@ -2,8 +2,8 @@ curl -G -s "http://localhost:3100/loki/api/v1/query_range?limit=3" --data-urlenc
 
 TODO:
 README - uzpełnic
-Sieci dockerowe 
-docker-compose.yaml
+fix config files in docker compose
+logi grafana
 dopracować skrypt uruchomieniowy
 dashboard
 zapytania przykładowe i co w ogóle zbierać

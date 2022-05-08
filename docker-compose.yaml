@@ -9,3 +9,38 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+      - GF_LOG_FILE_LEVEL=${GF_LOG_FILE_LEVEL}
+    networks:
+      - nt_systemlogs
+
+  loki:
+    image: grafana/loki
+    container_name: loki
+    restart: always
+    ports:
+      - ${LK_EXTERNAL_PORT}:3100
+    volumes:
+      - ./loki:/mnt/config
+    configs:
+      - /mnt/config/loki-config.yaml
+    networks:
+      - nt_systemlogs
+    
+  promtail: 
+    image: grafana/promtail
+    container_name: promtail
+    restart: always
+    volumes:
+      - ./promtail:/mnt/config
+      - /var/log:/var/log
+      - ./logs:/var/nextcloud
+    configs:
+      - /mnt/config/promtail-config.yaml
+    external_links:
+      - loki
+    networks:
+      - nt_systemlogs
+
+networks:
+  nt_systemlogs:
+    name: nt_systemlogs
