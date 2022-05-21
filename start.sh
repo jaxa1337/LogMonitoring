@@ -95,14 +95,17 @@ check_download_file $promtail_archive $link_promtail_archive
 echo "Logs from nextcloud will be stored in $logs_directory."
 
 #Edit config files
-text="
-- job_name: nextcloud
+if [ -z "$(grep "host_log" ./$promtail_config)" ]; then
+    sed -i 's/var\/log/var\/log\/host_log/' $promtail_config
+fi
+
+text="- job_name: nextcloud
   static_configs:
   - targets:
       - localhost
     labels:
       job: nextcloud_apache
-      __path__: $logs_directory/*log"
+      __path__: /var/nextcloud/*log"
 
 if [ -z "$(grep "nextcloud" ./$promtail_config)" ]; then
     echo "$text" >> $promtail_config
@@ -115,8 +118,8 @@ exec 2>&6
 # docker-compose up -d
 docker network create logsystem_network
 
-#-----------NEXTCLOUD---------
-#-v path_on_host:path_in_docker_container \
+# -----------NEXTCLOUD---------
+# -v path_on_host:path_in_docker_container \
 docker run --name nextcloud -d \
         -p $nextcloud_port:80 \
         -v "$logs_directory":/var/log/apache2 \
@@ -128,19 +131,19 @@ docker run --name loki -d \
         -v "$current_directory"/loki:/mnt/config \
         --network logsystem_network \
         -p $loki_port:3100 grafana/loki:$version \
-        -config.file=/mnt/config/loki-config.yaml \
+        -config.file=/mnt/config/loki-config.yaml
 
 #------------PROMTAIL---------
 docker run --name promtail -d \
         -v "$current_directory"/promtail:/mnt/config \
-        -v /var/log:/var/log \
+        -v /var/log:/var/log/host_log \
         -v "$logs_directory":/var/nextcloud \
         --network logsystem_network \
         --link loki grafana/promtail:$version \
         -config.file=/mnt/config/promtail-config.yaml
 
 #------------GRAFANA-----------
-docker run --name grafana -it \
+docker run --name grafana -d \
         -p $grafana_port:3000 \
         -e "GF_SECURITY_ADMIN_USER=$grafana_username" \
         -e "GF_SECURITY_ADMIN_PASSWORD=$grafana_password" \

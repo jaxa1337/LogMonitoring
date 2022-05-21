@@ -15,7 +15,7 @@ scrape_configs:
       - localhost
     labels:
       job: varlogs
-      __path__: /var/log/*log
+      __path__: /var/log/host_log/*log
 - job_name: nextcloud
   static_configs:
   - targets:
