@@ -77,8 +77,14 @@ function check_download_file() {
     fi
 }
 
+if [ -e "$lock_file" ]; then
+    echo "Lock file exist. Cannot run this script. You must run stop.sh script"
+    exit 1
+fi
+
+
 ## Catch Ctr+C signal
-# trap remove_lock_file SIGINT
+trap remove_lock_file SIGINT
 
 ## Create directories for loki promtail grafana and logs
 directories=(grafana logs loki promtail)
@@ -116,6 +122,7 @@ fi
 exec 2>&6
 # docker-compose -f docker-compose.nextcloud.yaml up -d
 # docker-compose up -d
+touch $lock_file
 docker network create logsystem_network
 
 # -----------NEXTCLOUD---------
