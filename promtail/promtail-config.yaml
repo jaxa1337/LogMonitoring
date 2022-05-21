@@ -17,10 +17,9 @@ scrape_configs:
       job: varlogs
       __path__: /var/log/*log
 - job_name: nextcloud
-    static_configs:
-    - targets:
-        - localhost
-        labels:
-        job: nextcloud_apache
-        instance: localserver
-        __path__: /home/jaxa/projects/logs_system/logs
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: nextcloud_apache
+      __path__: /var/nextcloud/*log

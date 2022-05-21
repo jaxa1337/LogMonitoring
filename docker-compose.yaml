@@ -1,5 +1,16 @@
 version: "3"
 services:
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    restart: always
+    ports:
+      - ${NC_EXTERNAL_PORT}:80
+    volumes:
+      - ./logs:/var/log/apache2
+    networks:
+      - logsystem_network
+
   grafana:
     image: grafana/grafana
     container_name: grafana
@@ -11,7 +22,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
       - GF_LOG_FILE_LEVEL=${GF_LOG_FILE_LEVEL}
     networks:
-      - nt_systemlogs
+      - logsystem_network
 
   loki:
     image: grafana/loki
@@ -22,25 +33,30 @@ services:
     volumes:
       - ./loki:/mnt/config
     configs:
-      - /mnt/config/loki-config.yaml
+      - loki_config
     networks:
-      - nt_systemlogs
+      - logsystem_network
     
   promtail: 
     image: grafana/promtail
     container_name: promtail
     restart: always
     volumes:
-      - ./promtail:/mnt/config
       - /var/log:/var/log
       - ./logs:/var/nextcloud
     configs:
-      - /mnt/config/promtail-config.yaml
+      - nextcloud_config
     external_links:
       - loki
     networks:
-      - nt_systemlogs
+      - logsystem_network
+
+configs:
+  nextcloud_config:
+    file: ./promtail/promtail-config.yaml
+  loki_config:
+    file: ./loki/loki-config.yaml
 
 networks:
   nt_systemlogs:
-    name: nt_systemlogs
+    name: logsystem_network
