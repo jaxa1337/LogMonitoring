@@ -50,6 +50,7 @@ function remove_lock_file() {
             echo "Cannot remove lock file: ${lock_file}"
             exit 3
         }
+        echo "Lock file removed."
     fi
 }
 
@@ -127,6 +128,7 @@ docker network create logsystem_network
 
 # -----------NEXTCLOUD---------
 # -v path_on_host:path_in_docker_container \
+echo "Starting nextcloud container..."
 docker run --name nextcloud -d \
         -p $nextcloud_port:80 \
         -v "$logs_directory":/var/log/apache2 \
@@ -134,13 +136,16 @@ docker run --name nextcloud -d \
         nextcloud
 
 #--------------LOKI-----------
+echo "Starting loki container..."
 docker run --name loki -d \
         -v "$current_directory"/loki:/mnt/config \
         --network logsystem_network \
         -p $loki_port:3100 grafana/loki:$version \
         -config.file=/mnt/config/loki-config.yaml
 
+
 #------------PROMTAIL---------
+echo "Starting promtail container..."
 docker run --name promtail -d \
         -v "$current_directory"/promtail:/mnt/config \
         -v /var/log:/var/log/host_log \
@@ -150,6 +155,7 @@ docker run --name promtail -d \
         -config.file=/mnt/config/promtail-config.yaml
 
 #------------GRAFANA-----------
+echo "Starting grafana container..."
 docker run --name grafana -d \
         -p $grafana_port:3000 \
         -e "GF_SECURITY_ADMIN_USER=$grafana_username" \
