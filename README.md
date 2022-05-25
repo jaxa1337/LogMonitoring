@@ -1,4 +1,4 @@
-# LogMonitoring
+# __LogMonitoring__
 
 This simple script automaticly running set of docker containers to logs monitoring in system and nextcloud. 
 
@@ -8,14 +8,14 @@ Containers which will be started:
 - grafana
 - nextcloud
 
-## Usage
+## __Usage__
 ___
 
  - Just use ```start.sh``` file to run containers. When you used this script, lock file was created. This file just block this script, and you must use ```stop.sh``` script to delete lock file. 
 
     In script are some variables. You can change it if you want.
     Variables:
-
+    ```
     - lock_file="/tmp/log_sys_lock_file" - path to script file
     - loki_config="loki/loki-config.yaml" - path to loki config
     - loki_archive="loki/loki-linux-arm64.zip" - path to loki package
@@ -30,6 +30,7 @@ ___
     - grafana_log_level="error"
     - current_directory=$(pwd)
     - logs_directory=$current_directory/logs - path to directory where logs from nextcloud will be stored
+    ```
 
     Unfortunatelly I cannot use docker-compose, because current version (v1.29.2, 24/04/2022) of it does not support config files. Docker-compose files are ready to use but I cannot use presonalized config files for loki and promtail.
 
@@ -41,10 +42,10 @@ ___
 
 - Create dashboard in Grafana. Use LogQL to create queries to the Loki.
 
-## Sources
-- Promtail: https://grafana.com/docs/loki/latest/clients/promtail/
-- Grafana: https://grafana.com/oss/grafana/
-- Loki: https://grafana.com/oss/loki/
-- LogQL: https://grafana.com/docs/loki/latest/logql/
-- Nextcloud: https://hub.docker.com/_/nextcloud/
+## __Sources__
+- _Promtail_: https://grafana.com/docs/loki/latest/clients/promtail/
+- _Grafana_: https://grafana.com/oss/grafana/
+- _Loki_: https://grafana.com/oss/loki/
+- _LogQL_: https://grafana.com/docs/loki/latest/logql/
+- _Nextcloud_: https://hub.docker.com/_/nextcloud/
 
