@@ -11,10 +11,10 @@ Containers which will be started:
 ## Usage
 ___
 
-Just use ```start.sh``` file to run containers. When you used this script, lock file was created. This file just block this script, and you must use ```stop.sh``` script to delete lock file. 
+ - Just use ```start.sh``` file to run containers. When you used this script, lock file was created. This file just block this script, and you must use ```stop.sh``` script to delete lock file. 
 
-In script are some variables. You can change it if you want.
-Variables:
+    In script are some variables. You can change it if you want.
+    Variables:
 
     - lock_file="/tmp/log_sys_lock_file" - path to script file
     - loki_config="loki/loki-config.yaml" - path to loki config
@@ -31,6 +31,20 @@ Variables:
     - current_directory=$(pwd)
     - logs_directory=$current_directory/logs - path to directory where logs from nextcloud will be stored
 
-Unfortunatelly I cannot use docker-compose, because current version (v1.29.2, 24/04/2022) of it does not support config files. Docker-compose files are ready to use but I cannot use presonalized config files for loki and promtail. 
+    Unfortunatelly I cannot use docker-compose, because current version (v1.29.2, 24/04/2022) of it does not support config files. Docker-compose files are ready to use but I cannot use presonalized config files for loki and promtail.
 
+- Add data source in Grafana (http://0.0.0.0:3000):
+
+    1. Go to: Configuration -> Data Sources -> Add data source -> Loki
+    2. Write ```http://loki:3100``` to URL field.
+    3. Press ```Save and test``` button.
+
+- Create dashboard in Grafana. Use LogQL to create queries to the Loki.
+
+## Sources
+- Promtail: https://grafana.com/docs/loki/latest/clients/promtail/
+- Grafana: https://grafana.com/oss/grafana/
+- Loki: https://grafana.com/oss/loki/
+- LogQL: https://grafana.com/docs/loki/latest/logql/
+- Nextcloud: https://hub.docker.com/_/nextcloud/
 

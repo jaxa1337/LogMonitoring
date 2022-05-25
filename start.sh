@@ -130,6 +130,7 @@ docker network create logsystem_network
 # -v path_on_host:path_in_docker_container \
 echo "Starting nextcloud container..."
 docker run --name nextcloud -d \
+        --restart=always \
         -p $nextcloud_port:80 \
         -v "$logs_directory":/var/log/apache2 \
         --network logsystem_network \
@@ -139,6 +140,7 @@ docker run --name nextcloud -d \
 echo "Starting loki container..."
 docker run --name loki -d \
         -v "$current_directory"/loki:/mnt/config \
+        --restart=always \
         --network logsystem_network \
         -p $loki_port:3100 grafana/loki:$version \
         -config.file=/mnt/config/loki-config.yaml
@@ -147,6 +149,7 @@ docker run --name loki -d \
 #------------PROMTAIL---------
 echo "Starting promtail container..."
 docker run --name promtail -d \
+        --restart=always \
         -v "$current_directory"/promtail:/mnt/config \
         -v /var/log:/var/log/host_log \
         -v "$logs_directory":/var/nextcloud \
@@ -157,6 +160,7 @@ docker run --name promtail -d \
 #------------GRAFANA-----------
 echo "Starting grafana container..."
 docker run --name grafana -d \
+        --restart=always \
         -p $grafana_port:3000 \
         -e "GF_SECURITY_ADMIN_USER=$grafana_username" \
         -e "GF_SECURITY_ADMIN_PASSWORD=$grafana_password" \
