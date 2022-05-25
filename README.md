@@ -34,6 +34,7 @@ ___
 
     Unfortunatelly I cannot use docker-compose, because current version (v1.29.2, 24/04/2022) of it does not support config files. Docker-compose files are ready to use but I cannot use presonalized config files for loki and promtail.
 
+
 - Add data source in Grafana (http://0.0.0.0:3000):
 
     1. Go to: Configuration -> Data Sources -> Add data source -> Loki
@@ -42,6 +43,13 @@ ___
 
 - Create dashboard in Grafana. Use LogQL to create queries to the Loki.
 
+## Test
+
+If you aren't sure that logs are not collected correctly, you can use cURL. It is the fastest way to make you sure that logs are in Loki. Example:
+```
+curl -G -s "http://localhost:3100/loki/api/v1/query_range?limit=10" --data-urlencode 'query={job="varlogs"}' | jq
+```
+----
 ## __Sources__
 - _Promtail_: https://grafana.com/docs/loki/latest/clients/promtail/
 - _Grafana_: https://grafana.com/oss/grafana/
