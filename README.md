@@ -8,6 +8,8 @@ Containers which will be started:
 - grafana
 - nextcloud
 
+__You need only: Docker, wget__
+
 ## __Usage__
 ___
 
@@ -46,6 +48,7 @@ ___
 ## Test
 
 If you aren't sure that logs are not collected correctly, you can use cURL. It is the fastest way to make you sure that logs are in Loki. Example:
+
 ```
 curl -G -s "http://localhost:3100/loki/api/v1/query_range?limit=10" --data-urlencode 'query={job="varlogs"}' | jq
 ```

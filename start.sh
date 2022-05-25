@@ -33,7 +33,7 @@ link_loki_archive="https://github.com/grafana/loki/releases/download/v$version/l
 link_promtail_config="https://raw.githubusercontent.com/grafana/loki/v$version/clients/cmd/promtail/promtail-docker-config.yaml"
 link_promtail_archive="https://github.com/grafana/loki/releases/download/v$version/promtail-linux-amd64.zip"
 
-## Check directory and if doesn't exist, create this.
+## Check directory and if doesn't exist, create them.
 function test_create_directory() {
     if [ -d "$1" ]; then
         echo "$1 directory exist!"
@@ -43,7 +43,7 @@ function test_create_directory() {
     fi
 }
 
-## Check if lock_file exist and delete it if is.
+## Check if lock_file exist and delete it if exist.
 function remove_lock_file() {
     if [ -e "$lock_file" ]; then
         $cmd_rm "$lock_file" || {
@@ -102,6 +102,7 @@ check_download_file $promtail_archive $link_promtail_archive
 echo "Logs from nextcloud will be stored in $logs_directory."
 
 #Edit config files
+#Add job to promatil config and change path
 if [ -z "$(grep "host_log" ./$promtail_config)" ]; then
     sed -i 's/var\/log/var\/log\/host_log/' $promtail_config
 fi
