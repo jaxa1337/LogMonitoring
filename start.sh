@@ -33,17 +33,17 @@ link_loki_archive="https://github.com/grafana/loki/releases/download/v$version/l
 link_promtail_config="https://raw.githubusercontent.com/grafana/loki/v$version/clients/cmd/promtail/promtail-docker-config.yaml"
 link_promtail_archive="https://github.com/grafana/loki/releases/download/v$version/promtail-linux-amd64.zip"
 
-## Check directory and if doesn't exist, create them.
+## Check directory and if it doesn't exist, create it.
 function test_create_directory() {
     if [ -d "$1" ]; then
-        echo "$1 directory exist!"
+        echo "$1 directory exists!"
     else
         mkdir "$1"
         echo "$1 directory created."
     fi
 }
 
-## Check if lock_file exist and delete it if exist.
+## Check if lock_file exists and delete it if it exists.
 function remove_lock_file() {
     if [ -e "$lock_file" ]; then
         $cmd_rm "$lock_file" || {
@@ -54,14 +54,14 @@ function remove_lock_file() {
     fi
 }
 
-## Check if file exist, if not download them.
+## Check if file exist, if not download it.
 function check_download_file() {
     if [ -n "$1" ] && [ -n "$2" ]; then
         if [ ! -e "$1" ]; then
-            echo "Try download file $1 from $2"
+            echo "Try to download file $1 from $2"
             wget "$2" -O "$1"
         else
-            echo "File $1 exist!"
+            echo "File $1 exists!"
             return 2
         fi
     else
@@ -79,7 +79,7 @@ function check_download_file() {
 }
 
 if [ -e "$lock_file" ]; then
-    echo "Lock file exist. Cannot run this script. You must run stop.sh script"
+    echo "Lock file exists. Cannot run this script. You must run stop.sh script"
     exit 1
 fi
 
@@ -93,7 +93,7 @@ for directory in "${directories[@]}"; do
     test_create_directory "$directory"
 done
 
-##Download nessesary files
+##Download necessary files
 check_download_file $loki_config $link_loki_config
 check_download_file $loki_archive $link_loki_archive
 check_download_file $promtail_config $link_promtail_config
